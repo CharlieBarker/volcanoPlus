@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="man/images/logo.png" width="50%" />
+</p>
+
 # volcanoPlus
 
 `plot_volcano_plus` is an R function that generates customizable volcano plots for visualizing differential expression data. This function offers enhanced functionality, including asymptotic thresholds for determining significance, and the ability to label specific points based on additional criteria. It is designed for use in genomics and other fields where visualizing the relationship between fold change and statistical significance is important.
