@@ -8,14 +8,14 @@
 #'   `logFC` (log fold change) and `adj.P.Val` (adjusted p-value).
 #'   Optionally, a `Gene` column can be included for labeling specific genes.
 #' @param title The title of the volcano plot.
-#' @param significant_parameters A named list of parameters for defining the asymptotic
-#'   significance threshold function. This list should contain:
-#'   - `a`: Controls the horizontal asymptote (default is `2`).
-#'   - `b`: Controls the vertical asymptote (default is `0.5`).
-#' @param labelling_parameters An optional named list of parameters for labeling specific points.
+#' @param significance_thresholds A named list of parameters for defining the significance threshold function.
 #'   This list should contain:
-#'   - `a`: Controls the horizontal asymptote for labeling.
-#'   - `b`: Controls the vertical asymptote for labeling.
+#'   - `horizontal_asymptote`: Controls the horizontal threshold for significance (default is `2`).
+#'   - `vertical_asymptote`: Controls the vertical threshold for significance (default is `0.5`).
+#' @param labeling_criteria An optional named list of parameters for labeling specific points.
+#'   This list should contain:
+#'   - `horizontal_asymptote`: Controls the horizontal threshold for labeling (default is `1.5`).
+#'   - `vertical_asymptote`: Controls the vertical threshold for labeling (default is `0.4`).
 #'   If not provided, no points will be labeled.
 #' @return A `ggplot` object representing the volcano plot.
 #' @details The function identifies significant points by applying a mirrored
@@ -23,69 +23,63 @@
 #'   this threshold are considered insignificant and are plotted with reduced transparency.
 #'   Optionally, specific points can be labeled based on additional asymptotic criteria.
 #' @import ggplot2
-#' @import cowplot
-#' @import ggrepel
 #' @examples
 #' # Example usage:
 #' # Assuming `data` is a data frame with `logFC`, `adj.P.Val`, and `Gene` columns.
-#' significant_params <- list("a" = 2, "b" = 0.5)
-#' labelling_params <- list("a" = 1.5, "b" = 0.4)
-#' plot_volcano_plus(data, "Volcano Plot Example", significant_params, labelling_params)
+#' significance_thresholds <- list("horizontal_asymptote" = 2, "vertical_asymptote" = 0.5)
+#' labeling_criteria <- list("horizontal_asymptote" = 1.5, "vertical_asymptote" = 0.4)
+#' plot_volcano_plus(data, "Volcano Plot Example", significance_thresholds, labeling_criteria)
 #' @export
 plot_volcano_plus <- function(to_plot, title,
-                              significant_parameters = list("a"=2,   # Horizontal asymptote.
-                                                            "b"=.5), # Vertical asymptote.
-                              labelling_parameters = NULL         # Separate parameters for labeling.
+                              significance_thresholds = list("horizontal_asymptote" = 2,   # Horizontal threshold for significance.
+                                                             "vertical_asymptote" = 0.5), # Vertical threshold for significance.
+                              labeling_criteria = NULL         # Parameters for labeling points.
 ) {
 
-  # Define the parameters
-  c <- 0   # Y-intercept
-
-  # Internal function to define the mirrored function
+  # Internal function to define the mirrored asymptotic function
   mirrored_asymptotic_function <- function(x,
-                                           a=significant_parameters$a,
-                                           b=significant_parameters$b
-  ) {
-    c=0
-    y <- a / (abs(x) - b) + c
+                                           horizontal_asymptote = significance_thresholds$horizontal_asymptote,
+                                           vertical_asymptote = significance_thresholds$vertical_asymptote) {
+    y <- horizontal_asymptote / (abs(x) - vertical_asymptote)
     return(y)
   }
 
   # Identify points above and below the mirrored function
-  which_significant <- mirrored_asymptotic_function(to_plot$logFC)
-  to_plot$below <- -log10(to_plot$adj.P.Val) < which_significant
-  to_plot$below[abs(to_plot$logFC) < significant_parameters$b] <- TRUE
+  threshold_values <- mirrored_asymptotic_function(to_plot$logFC)
+  to_plot$below <- -log10(to_plot$adj.P.Val) < threshold_values
+  to_plot$below[abs(to_plot$logFC) < significance_thresholds$vertical_asymptote] <- TRUE
 
-  # Define alpha values based on 'below'
+  # Define alpha values based on whether points are below the threshold
   alpha_values <- ifelse(to_plot$below, 0.1, 0.5)
 
+  # Initialize the label column
   to_plot$label <- ""
 
-  # If labeling parameters are supplied, add labels
-  if (!is.null(labelling_parameters)) {
-    which_labelled <- mirrored_asymptotic_function(to_plot$logFC, a=labelling_parameters$a, b=labelling_parameters$b)
-    to_plot$to_label <- -log10(to_plot$adj.P.Val) < which_labelled
-    to_plot$below[abs(to_plot$logFC) < labelling_parameters$b] <- TRUE
+  # If labeling criteria are provided, add labels
+  if (!is.null(labeling_criteria)) {
+    labeling_threshold_values <- mirrored_asymptotic_function(to_plot$logFC,
+                                                              horizontal_asymptote = labeling_criteria$horizontal_asymptote,
+                                                              vertical_asymptote = labeling_criteria$vertical_asymptote)
+    to_plot$to_label <- -log10(to_plot$adj.P.Val) < labeling_threshold_values
+    to_plot$below[abs(to_plot$logFC) < labeling_criteria$vertical_asymptote] <- TRUE
     to_plot$label[!to_plot$below] <- to_plot$Gene[!to_plot$below]
   }
 
-  # Create the volcano plot
-  volcano_plot <- ggplot(to_plot,
-                         aes(logFC, -log10(adj.P.Val), color = below, label = label)) +
-    geom_point(alpha = alpha_values) +
-    cowplot::theme_cowplot() +
-    geom_text_repel(min.segment.length = 0, seed = 42, box.padding = 0.5,
-                    color = "black",
-                    size=2) +
-    geom_vline(xintercept = 0, linetype = 'dotted', col = 'darkred') +
+  # Basic volcano plot using ggplot2
+  volcano_plot <- ggplot(to_plot, aes(x = logFC, y = -log10(adj.P.Val), color = below, label = label)) +
+    geom_point(alpha = alpha_values) +  # Add points with transparency based on significance
+    geom_vline(xintercept = 0, linetype = 'dotted', color = 'darkred') +  # Vertical line at x = 0
+    xlab("Log fold change") + ylab("Log10(Adjusted P value)") +
+    ggtitle(title) +  # Set plot title
+    theme_minimal() +  # Minimal theme (no extra packages)
     theme(legend.position = "none") +
-    ylab("Log10(Adjusted P value)") + xlab("Log fold change") +
-    geom_function(fun = mirrored_asymptotic_function,
-                  colour = ghibli_palettes$YesterdayDark[4], alpha = 0.5) +
-    scale_color_manual(values = c("TRUE" = "lightgrey", "FALSE" = "darkblue")) +
-    ylim(0, max(-log10(to_plot$adj.P.Val))) +
-    ggtitle(title) +
-    theme(plot.title = element_text(size = 12, face = "bold"))
+    geom_function(fun = mirrored_asymptotic_function, alpha = 0.5) +
+    ylim(0, max(-log10(to_plot$adj.P.Val)))
+
+  # Optionally add labels if labeling_criteria is provided
+  if (!is.null(labeling_criteria)) {
+    volcano_plot <- volcano_plot + geom_text(aes(label = label), size = 3, hjust = 1.5, vjust = 1.5)
+  }
 
   return(volcano_plot)
 }
