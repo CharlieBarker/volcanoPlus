@@ -109,7 +109,7 @@ Here's an example of the resulting volcano plot:
 
 output :
 <p align="center">
-  <img src="man/images/logo.png" width="50%" />
+  <img src="man/images/volcano_plot.png" width="50%" />
 </p>
 This plot shows the log fold change on the x-axis and the -log10 adjusted p-value on the y-axis. Points that fall below the asymptotic threshold are considered insignificant and are plotted with reduced transparency.
 ---
