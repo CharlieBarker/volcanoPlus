@@ -7,8 +7,8 @@
 plot_volcano_plus(
   to_plot,
   title,
-  significant_parameters = list(a = 2, b = 0.5),
-  labelling_parameters = NULL
+  significance_thresholds = list(horizontal_asymptote = 2, vertical_asymptote = 0.5),
+  labeling_criteria = NULL
 )
 }
 \arguments{
@@ -18,18 +18,18 @@ Optionally, a \code{Gene} column can be included for labeling specific genes.}
 
 \item{title}{The title of the volcano plot.}
 
-\item{significant_parameters}{A named list of parameters for defining the asymptotic
-significance threshold function. This list should contain:
-\itemize{
-\item \code{a}: Controls the horizontal asymptote (default is \code{2}).
-\item \code{b}: Controls the vertical asymptote (default is \code{0.5}).
-}}
-
-\item{labelling_parameters}{An optional named list of parameters for labeling specific points.
+\item{significance_thresholds}{A named list of parameters for defining the significance threshold function.
 This list should contain:
 \itemize{
-\item \code{a}: Controls the horizontal asymptote for labeling.
-\item \code{b}: Controls the vertical asymptote for labeling.
+\item \code{horizontal_asymptote}: Controls the horizontal threshold for significance (default is \code{2}).
+\item \code{vertical_asymptote}: Controls the vertical threshold for significance (default is \code{0.5}).
+}}
+
+\item{labeling_criteria}{An optional named list of parameters for labeling specific points.
+This list should contain:
+\itemize{
+\item \code{horizontal_asymptote}: Controls the horizontal threshold for labeling (default is \code{1.5}).
+\item \code{vertical_asymptote}: Controls the vertical threshold for labeling (default is \code{0.4}).
 If not provided, no points will be labeled.
 }}
 }
@@ -50,7 +50,7 @@ Optionally, specific points can be labeled based on additional asymptotic criter
 \examples{
 # Example usage:
 # Assuming `data` is a data frame with `logFC`, `adj.P.Val`, and `Gene` columns.
-significant_params <- list("a" = 2, "b" = 0.5)
-labelling_params <- list("a" = 1.5, "b" = 0.4)
-plot_volcano_plus(data, "Volcano Plot Example", significant_params, labelling_params)
+significance_thresholds <- list("horizontal_asymptote" = 2, "vertical_asymptote" = 0.5)
+labeling_criteria <- list("horizontal_asymptote" = 1.5, "vertical_asymptote" = 0.4)
+plot_volcano_plus(data, "Volcano Plot Example", significance_thresholds, labeling_criteria)
 }
