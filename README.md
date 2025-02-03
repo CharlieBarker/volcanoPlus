@@ -13,7 +13,7 @@ The `volcanoPlus` package allows you to create volcano plots with custom asympto
 ## Features
 
 - **Custom Asymptotic Thresholding:** Define mirrored asymptotic functions to identify significant points based on log fold change and adjusted p-values.
-- **Flexible Point Labeling:** Highlight and label specific points (e.g., genes) based on user-defined criteria.
+- **Flexible Point Labeling:** Highlights and labels specific points (e.g., genes) based on user-defined criteria.
 - **Enhanced Visualization:** Control the appearance of significant and non-significant points using alpha transparency, custom colors, and asymptotic curves.
 
 
