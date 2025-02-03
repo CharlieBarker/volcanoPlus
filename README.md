@@ -28,22 +28,71 @@ install.packages("devtools")
 
 # Install volcanoPlus from GitHub
 devtools::install_github("CharlieBarker/volcanoPlus")
-
-
-## Custom Pathway Layouts
-
-Organize nodes in a biologically meaningful way, based on their roles (e.g., receptors, transcription factors).
-
-Load packages: 
+```
+Then load the necessary libraries:
 ```r
 # Load the volcanoPlus package
 library(volcanoPlus)
 library(ghibli)
 library(ggplot2)
+```
+Step 2: Download Example Data
+-----------------------------
 
+For demonstration purposes, we'll use a sample dataset. The following code will download and read an RDS file that contains the data:
+```r
+# Download the data we will use for plotting
+download.file("https://raw.githubusercontent.com/biocorecrg/CRG_RIntroduction/master/de_df_for_volcano.rds",
+              "de_df_for_volcano.rds", method="curl")
+
+# The RDS format is used to save a single R object to a file, and to restore it.
+# Extract that object in the current session:
+tmp <- readRDS("de_df_for_volcano.rds")
+
+# Remove rows that contain NA values
+de <- tmp[complete.cases(tmp), ]
+
+# Example Data (Replace this with actual data)
+# For this example, we assume a data frame with `logFC`, `adj.P.Val`, and `Gene` columns.
+data <- data.frame(
+  logFC = de$log2FoldChange,
+  adj.P.Val = de$pvalue,
+  Gene = de$gene_symbol
+)
+```
+Step 3: Set Significance Thresholds and Labeling Criteria
+--------------------------------------------------------
+
+You can define custom thresholds for significance (horizontal and vertical asymptotes) and labeling criteria:
+```r
+# Set significance thresholds for the volcano plot
+significance_thresholds <- list(horizontal_asymptote = 2, vertical_asymptote = 0.2)
+
+# Optional: Set parameters for labeling specific points
+labeling_criteria <- list(horizontal_asymptote = 2, vertical_asymptote = 0.2)
 ```
 
-Step 6: Saving the Plot to PNG
+Step 4: Generate the Volcano Plot
+---------------------------------
+
+Now, you can create the volcano plot with the `plot_volcano_plus` function:
+
+```r
+# Create the volcano plot
+volcano_plot <- plot_volcano_plus(data,
+                                  title = "",
+                                  significance_thresholds = significance_thresholds,
+                                  labeling_criteria = labeling_criteria)
+
+# Show the volcano plot
+print(volcano_plot  +
+        geom_vline(xintercept = 0, linetype = 'dotted', color = 'darkred') +  # Vertical line at x = 0
+        xlab("Log fold change") + ylab("Log10(Adjusted P value)") +
+        theme_minimal() +  # Minimal theme (no extra packages)
+        theme(legend.position = "none"))
+```
+
+Step 5: Saving the Plot to PNG
 ------------------------------
 
 If you want to save the plot to a PNG file, use the following code:
