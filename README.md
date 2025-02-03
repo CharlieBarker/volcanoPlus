@@ -7,6 +7,7 @@ VolcanoPlus Package: A Custom Volcano Plot Generator
 
 Introduction
 ------------
+In biological analyses, such as RNA-seq or proteomics, biostatisticians often need to differentiate between statistically significant and non-significant changes. The ability to define custom asymptotic thresholds for significance allows a more nuanced classification of results, based on the specific characteristics of the data and the research question.
 
 The `volcanoPlus` package allows you to create volcano plots with custom asymptotic thresholds and optional labeling of specific points. This tutorial will guide you through generating a volcano plot from a dataset, setting significance thresholds, and visualizing the result.
 
