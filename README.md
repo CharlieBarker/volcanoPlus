@@ -11,13 +11,6 @@ In biological analyses, such as RNA-seq or proteomics, biostatisticians often ne
 
 The `volcanoPlus` package allows you to create volcano plots with custom asymptotic thresholds and optional labeling of specific points. This tutorial will guide you through generating a volcano plot from a dataset, setting significance thresholds, and visualizing the result.
 
-## Features
-
-- **Custom Asymptotic Thresholding:** Define mirrored asymptotic functions to identify significant points based on log fold change and adjusted p-values.
-- **Flexible Point Labeling:** Highlights and labels specific points (e.g., genes) based on user-defined criteria.
-- **Enhanced Visualization:** Control the appearance of significant and non-significant points using alpha transparency, custom colors, and asymptotic curves.
-
-
 Step 1: Install and Load the Package
 ------------------------------------
 
