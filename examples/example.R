@@ -35,4 +35,8 @@ volcano_plot <- plot_volcano_plus(data,
                                   labeling_criteria = labeling_criteria)
 
 # Show the volcano plot
-print(volcano_plot)
+print(volcano_plot  +
+        geom_vline(xintercept = 0, linetype = 'dotted', color = 'darkred') +  # Vertical line at x = 0
+        xlab("Log fold change") + ylab("Log10(Adjusted P value)") +
+        theme_minimal() +  # Minimal theme (no extra packages)
+        theme(legend.position = "none"))

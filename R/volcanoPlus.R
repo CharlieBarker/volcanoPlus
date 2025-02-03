@@ -68,11 +68,6 @@ plot_volcano_plus <- function(to_plot, title,
   # Basic volcano plot using ggplot2
   volcano_plot <- ggplot(to_plot, aes(x = logFC, y = -log10(adj.P.Val), color = below, label = label)) +
     geom_point(alpha = alpha_values) +  # Add points with transparency based on significance
-    geom_vline(xintercept = 0, linetype = 'dotted', color = 'darkred') +  # Vertical line at x = 0
-    xlab("Log fold change") + ylab("Log10(Adjusted P value)") +
-    ggtitle(title) +  # Set plot title
-    theme_minimal() +  # Minimal theme (no extra packages)
-    theme(legend.position = "none") +
     geom_function(fun = mirrored_asymptotic_function, alpha = 0.5) +
     ylim(0, max(-log10(to_plot$adj.P.Val)))
 
